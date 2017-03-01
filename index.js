@@ -10,11 +10,19 @@ container.setAttribute('height', HEIGHT)
 
 body.appendChild(container)
 
-function paintMainBox(){
-    let mainBox = document.createElementNS(NS_LINK, 'rect')
-    let widthMainBox = 600
-    let heightMainBox = 300
 
+let widthMainBox = 600
+let heightMainBox = 300
+
+
+
+function init(){
+    paintMainBox(widthMainBox, heightMainBox)
+    paintSubBoxs(10, widthMainBox, heightMainBox)
+}
+
+function paintMainBox(widthMainBox, heightMainBox){
+    let mainBox = document.createElementNS(NS_LINK, 'rect')
 
     mainBox.setAttribute('width', widthMainBox)
     mainBox.setAttribute('height', heightMainBox)
@@ -24,18 +32,19 @@ function paintMainBox(){
 
     container.appendChild(mainBox)
 
-    paintSubBoxs(widthMainBox, heightMainBox)
+    //paintSubBoxs(widthMainBox, heightMainBox)
 }
 
 
-function paintSubBoxs(widthMainBox, heightMainBox){
+function paintSubBoxs(nb_Box, widthMainBox, heightMainBox){
     let widthSubBox = 200
     const heightSubBox = 70
+
 
     let wMainBox = widthMainBox
     let hMainBox = heightMainBox
 
-    let nb_Box = 2
+    let n_Box = nb_Box || 20
 
     let g = document.createElement('g')
 
@@ -75,14 +84,29 @@ function getRandom(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+function betterPlacementBox(nbRep){
+    let j = nbRep
+
+    let dispo = []
+
+    for (let i = 0; i < j; i++){
+
+
+    }
+}
+
 
 function caseManagementPoint(currentRect, nextRect){
     let pointsCurrentRect = getPointOfRectangle(currentRect)
     let pointsNextRect = getPointOfRectangle(nextRect)
     let pointsNextInCurrent = isPointsInRectangle(pointsCurrentRect, pointsNextRect)
 
+
+
     console.log('nb point dans rec curr', getNumberPointInRectangle(pointsNextInCurrent))
     console.info('detail', pointsNextInCurrent)
+
+    console.log('function de cout', calculateCost(pointsCurrentRect, pointsNextRect, pointsNextInCurrent))
 
 }
 
@@ -105,12 +129,21 @@ function calculateCost(pointsCurrRect, pointsNextRect, pointsNextRectInCurr){
     else if(pointsNextRectInCurr.a && pointsNextRectInCurr.b){
         longueur = pointsNextRect.b.x - pointsNextRect.a.x
         largeur = pointsCurrRect.d.y - pointsNextRect.a.y
-        surface = longueur*largeur
+        surface = longueur * largeur
     }
 
     // B & C
-    else if(){
+    else if(pointsNextRectInCurr.b && pointsNextRectInCurr.c){
+        longueur = pointsNextRect.b.x - pointsCurrRect.a.x
+        largeur = pointsNextRect.c.y - pointsNextRect.b.y
+        surface = longueur * largeur
+    }
 
+    // C & D
+    else if(pointsNextRectInCurr.c && pointsNextRectInCurr.d){
+        longueur = pointsNextRect.c.x - pointsNextRect.d.x
+        largeur = pointsNextRect.d.y - pointsCurrRect.a.y
+        surface = longueur * largeur
     }
 
     // A & D
@@ -120,11 +153,43 @@ function calculateCost(pointsCurrRect, pointsNextRect, pointsNextRectInCurr){
         surface = longueur * largeur
     }
 
+    // Case only 1 point
 
+    // A
+    else if(pointsNextRectInCurr.a){
+        longueur = pointsCurrRect.b.x - pointsNextRect.a.x
+        largeur = pointsCurrRect.d.y - pointsNextRect.a.y
+        surface = longueur * largeur
+    }
 
+    // B
+    else if(pointsNextRectInCurr.b){
+        longueur = pointsNextRect.b.x - pointsCurrRect.a.x
+        largeur = pointsCurrRect.d.y - pointsNextRect.b.y
+        surface = longueur * largeur
+    }
 
+    // C
+    else if(pointsNextRectInCurr.c){
+        longueur = pointsNextRect.c.x - pointsCurrRect.a.x
+        largeur = pointsNextRect.c.y - pointsCurrRect.a.y
+        surface = longueur * largeur
+    }
 
+    // D
+    else if(pointsNextRectInCurr.d){
+        longueur = pointsCurrRect.b.x - pointsNextRect.d.x
+        largeur = pointsNextRect.d.y - pointsCurrRect.b.y
+        surface = longueur * largeur
+    }
 
+    else{
+        surface = 0
+    }
+
+    cost = surface
+
+    return cost
 }
 
 
@@ -200,5 +265,5 @@ function getPointOfRectangle(rect){
 }
 
 
-window.addEventListener('load', paintMainBoxWithSubBoxs)
+window.addEventListener('load', init)
 
