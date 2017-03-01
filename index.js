@@ -10,15 +10,14 @@ container.setAttribute('height', HEIGHT)
 
 body.appendChild(container)
 
-
 let widthMainBox = 600
 let heightMainBox = 300
 
-
-
 function init(){
     paintMainBox(widthMainBox, heightMainBox)
-    paintSubBoxs(10, widthMainBox, heightMainBox)
+    //paintSubBoxs(10, widthMainBox, heightMainBox)
+
+    betterPlacementBox(20000, 30)
 }
 
 function paintMainBox(widthMainBox, heightMainBox){
@@ -31,8 +30,6 @@ function paintMainBox(widthMainBox, heightMainBox){
     mainBox.setAttribute('style', 'stroke:none; fill:black')
 
     container.appendChild(mainBox)
-
-    //paintSubBoxs(widthMainBox, heightMainBox)
 }
 
 
@@ -40,15 +37,14 @@ function paintSubBoxs(nb_Box, widthMainBox, heightMainBox){
     let widthSubBox = 200
     const heightSubBox = 70
 
-
     let wMainBox = widthMainBox
     let hMainBox = heightMainBox
 
     let n_Box = nb_Box || 20
 
-    let g = document.createElement('g')
+    let g = document.createElementNS(NS_LINK, 'g')
 
-    for(let i = 0; i < nb_Box; i ++){
+    for(let i = 0; i < n_Box; i ++){
 
         let subBox = document.createElementNS(NS_LINK, 'rect')
         let randPosY = getRandom(0, HEIGHT - heightSubBox)
@@ -57,7 +53,7 @@ function paintSubBoxs(nb_Box, widthMainBox, heightMainBox){
         if(randPosY > ((HEIGHT/2 - (hMainBox/2)) - heightSubBox) && randPosY < (HEIGHT/2 + (hMainBox/2))){
             let randVal = Math.round(Math.random())
 
-            randPosX = randVal ? Math.random() * ((WIDTH/2 - wMainBox/2) - widthSubBox) : getRandom(WIDTH/2 + wMainBox/2, WIDTH - widthSubBox)
+            randPosX = randVal ? Math.round(Math.random() * ((WIDTH/2 - wMainBox/2) - widthSubBox)) : getRandom(WIDTH/2 + wMainBox/2, WIDTH - widthSubBox)
         }
         else
             randPosX = getRandom(0, WIDTH - widthSubBox)
@@ -69,44 +65,71 @@ function paintSubBoxs(nb_Box, widthMainBox, heightMainBox){
         subBox.setAttribute('style', 'stroke:none; fill:red')
 
 
-        container.appendChild(subBox)
+        g.appendChild(subBox)
     }
-}
 
-
-function paintMainBoxWithSubBoxs(){
-    paintMainBox()
+    return g
 }
 
 /** UTILS **/
 
 function getRandom(min, max) {
-    return Math.random() * (max - min) + min;
+    return Math.round(Math.random() * (max - min) + min)
 }
 
-function betterPlacementBox(nbRep){
-    let j = nbRep
+function betterPlacementBox(nbRep, nb_box){
+    let nRep = nbRep
 
-    let dispo = []
+    let tab_dispositions = []
+    let bestPlacement
 
-    for (let i = 0; i < j; i++){
+    for (let i = 0; i < nRep; i++){
+        let g_elem = paintSubBoxs(nb_box, widthMainBox, heightMainBox)
+        let tab_rec = g_elem.children
 
-
+        if(!tab_dispositions[0]){
+            bestPlacement = tab_rec
+            tab_dispositions.push(calculateCostForDisposition(tab_rec), bestPlacement)
+        }
+        else if(calculateCostForDisposition(tab_rec) < tab_dispositions[0]){
+            bestPlacement = tab_rec
+            tab_dispositions[0] = calculateCostForDisposition(tab_rec, bestPlacement)
+        }
+        else{
+            continue
+        }
     }
+
+    container.appendChild(bestPlacement[0].parentNode)
+
+    console.info('TAB DISPOSITION', tab_dispositions)
 }
+
+function calculateCostForDisposition(tab_rect){
+    let totalCost = 0
+
+    for(let i = 0; i < tab_rect.length; i++){
+        let currRect = tab_rect[i]
+            for(let j = 0; j < tab_rect.length; j++){
+                nextRect = tab_rect[j]
+                if(currRect != nextRect){
+                    totalCost += caseManagementPoint(currRect, nextRect)
+                }
+            }
+    }
+
+    return totalCost
+}
+
 
 
 function caseManagementPoint(currentRect, nextRect){
     let pointsCurrentRect = getPointOfRectangle(currentRect)
     let pointsNextRect = getPointOfRectangle(nextRect)
     let pointsNextInCurrent = isPointsInRectangle(pointsCurrentRect, pointsNextRect)
+    let costResult = calculateCost(pointsCurrentRect, pointsNextRect, pointsNextInCurrent)
 
-
-
-    console.log('nb point dans rec curr', getNumberPointInRectangle(pointsNextInCurrent))
-    console.info('detail', pointsNextInCurrent)
-
-    console.log('function de cout', calculateCost(pointsCurrentRect, pointsNextRect, pointsNextInCurrent))
+    return costResult
 
 }
 
