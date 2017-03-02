@@ -8,6 +8,8 @@ https://en.wikipedia.org/wiki/Stochastic_optimization
 ## How to test it ?
 
 
+Modify the parameters in index.html, and just run index.html on your browser
+
 ```javascript
 let params = {
     mainBox: {
