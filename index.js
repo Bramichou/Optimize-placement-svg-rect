@@ -10,14 +10,14 @@ container.setAttribute('height', HEIGHT)
 
 body.appendChild(container)
 
-let widthMainBox = 600
-let heightMainBox = 300
+let widthMainBox = params.mainBox.width
+let heightMainBox = params.mainBox.height
 
 function init(){
     paintMainBox(widthMainBox, heightMainBox)
     //paintSubBoxs(10, widthMainBox, heightMainBox)
 
-    betterPlacementBox(30000, 30)
+    betterPlacementBox(params.nb_Rep, params.nb_box)
 }
 
 function paintMainBox(widthMainBox, heightMainBox){
