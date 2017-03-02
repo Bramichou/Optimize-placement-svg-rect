@@ -17,7 +17,7 @@ function init(){
     paintMainBox(widthMainBox, heightMainBox)
     //paintSubBoxs(10, widthMainBox, heightMainBox)
 
-    betterPlacementBox(20000, 30)
+    betterPlacementBox(30000, 30)
 }
 
 function paintMainBox(widthMainBox, heightMainBox){
@@ -62,7 +62,7 @@ function paintSubBoxs(nb_Box, widthMainBox, heightMainBox){
         subBox.setAttribute('height', heightSubBox)
         subBox.setAttribute('x', randPosX)
         subBox.setAttribute('y', randPosY)
-        subBox.setAttribute('style', 'stroke:none; fill:red')
+        subBox.setAttribute('style', 'stroke:black; fill:red')
 
 
         g.appendChild(subBox)
@@ -78,22 +78,28 @@ function getRandom(min, max) {
 }
 
 function betterPlacementBox(nbRep, nb_box){
+    console.time('Durée fonction de placement')
     let nRep = nbRep
 
     let tab_dispositions = []
     let bestPlacement
+    let isStarted = false
 
     for (let i = 0; i < nRep; i++){
         let g_elem = paintSubBoxs(nb_box, widthMainBox, heightMainBox)
         let tab_rec = g_elem.children
 
-        if(!tab_dispositions[0]){
+        if(!isStarted){
             bestPlacement = tab_rec
             tab_dispositions.push(calculateCostForDisposition(tab_rec), bestPlacement)
+            isStarted = !isStarted
         }
-        else if(calculateCostForDisposition(tab_rec) < tab_dispositions[0]){
+        if(calculateCostForDisposition(tab_rec) < tab_dispositions[0]){
             bestPlacement = tab_rec
-            tab_dispositions[0] = calculateCostForDisposition(tab_rec, bestPlacement)
+
+
+            tab_dispositions[0] = calculateCostForDisposition(tab_rec)
+            tab_dispositions[1] = bestPlacement
         }
         else{
             continue
@@ -101,8 +107,10 @@ function betterPlacementBox(nbRep, nb_box){
     }
 
     container.appendChild(bestPlacement[0].parentNode)
+    console.timeEnd('Durée fonction de placement')
+    console.info('Meilleur surface totale ' + tab_dispositions[0])
+    console.info('Nombre d\'iteration', nbRep)
 
-    console.info('TAB DISPOSITION', tab_dispositions)
 }
 
 function calculateCostForDisposition(tab_rect){
