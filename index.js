@@ -20,6 +20,12 @@ function init(){
     betterPlacementBox(params.nb_Rep, params.nb_box)
 }
 
+
+/**
+ * Dessin de la mainBox
+ * @param widthMainBox
+ * @param heightMainBox
+ */
 function paintMainBox(widthMainBox, heightMainBox){
     let mainBox = document.createElementNS(NS_LINK, 'rect')
 
@@ -32,7 +38,13 @@ function paintMainBox(widthMainBox, heightMainBox){
     container.appendChild(mainBox)
 }
 
-
+/**
+ * Dessin des subBoxs
+ * @param nb_Box
+ * @param widthMainBox
+ * @param heightMainBox
+ * @returns {Element}
+ */
 function paintSubBoxs(nb_Box, widthMainBox, heightMainBox){
     let widthSubBox = 200
     const heightSubBox = 70
@@ -77,6 +89,14 @@ function getRandom(min, max) {
     return Math.round(Math.random() * (max - min) + min)
 }
 
+let allGroup = []
+
+
+/**
+ * Fonction qui permet de trouver le meilleur placement possible
+ * @param nbRep
+ * @param nb_box
+ */
 function betterPlacementBox(nbRep, nb_box){
     console.time('Durée fonction de placement')
     let nRep = nbRep
@@ -89,6 +109,18 @@ function betterPlacementBox(nbRep, nb_box){
         let g_elem = paintSubBoxs(nb_box, widthMainBox, heightMainBox)
         let tab_rec = g_elem.children
 
+        let group = {
+            surface : 0,
+            element : []
+        }
+
+        console.log(calculateCostForDisposition(tab_rec))
+
+
+        group.surface = calculateCostForDisposition(tab_rec)
+        group.element[0] = (tab_rec)
+        allGroup.push(group)
+
         if(!isStarted){
             bestPlacement = tab_rec
             tab_dispositions.push(calculateCostForDisposition(tab_rec), bestPlacement)
@@ -96,7 +128,6 @@ function betterPlacementBox(nbRep, nb_box){
         }
         if(calculateCostForDisposition(tab_rec) < tab_dispositions[0]){
             bestPlacement = tab_rec
-
 
             tab_dispositions[0] = calculateCostForDisposition(tab_rec)
             tab_dispositions[1] = bestPlacement
@@ -110,8 +141,14 @@ function betterPlacementBox(nbRep, nb_box){
     console.timeEnd('Durée fonction de placement')
     console.info('Meilleur surface totale ' + tab_dispositions[0])
     console.info('Nombre d\'iteration', nbRep)
-
+    console.info("Historique", allGroup)
 }
+
+/**
+ * Fonction qui permet de calculer pour une "disposition" qui est un ensemble de rectangle, le cout total
+ * @param tab_rect
+ * @returns {number}
+ */
 
 function calculateCostForDisposition(tab_rect){
     let totalCost = 0
@@ -121,6 +158,11 @@ function calculateCostForDisposition(tab_rect){
             for(let j = 0; j < tab_rect.length; j++){
                 nextRect = tab_rect[j]
                 if(currRect != nextRect){
+
+                    let tab_pair_rect = {
+
+                    }
+
                     totalCost += caseManagementPoint(currRect, nextRect)
                 }
             }
@@ -130,7 +172,12 @@ function calculateCostForDisposition(tab_rect){
 }
 
 
-
+/**
+ * Fonction qui permet de gerer l'intersection de deux rectangles
+ * @param currentRect
+ * @param nextRect
+ * @returns {number}
+ */
 function caseManagementPoint(currentRect, nextRect){
     let pointsCurrentRect = getPointOfRectangle(currentRect)
     let pointsNextRect = getPointOfRectangle(nextRect)
@@ -141,6 +188,14 @@ function caseManagementPoint(currentRect, nextRect){
 
 }
 
+
+/**
+ * Fonction qui permet de calculer la surface de deux intersections
+ * @param pointsCurrRect
+ * @param pointsNextRect
+ * @param pointsNextRectInCurr
+ * @returns {number}
+ */
 function calculateCost(pointsCurrRect, pointsNextRect, pointsNextRectInCurr){
     let cost = 0
     let surface = 0
@@ -223,18 +278,12 @@ function calculateCost(pointsCurrRect, pointsNextRect, pointsNextRectInCurr){
     return cost
 }
 
-
-function getNumberPointInRectangle(points){
-    let nbPointInRectangle = 0
-
-    for( value  in points){
-        if (points[value])
-            nbPointInRectangle++
-    }
-
-    return nbPointInRectangle
-}
-
+/**
+ * Fonction qui permet de savoir quel(s) point(s) du rectangle suivant se trouve dans le rectangle courant
+ * @param pointsCurrRect
+ * @param pointsNextRect
+ * @returns {{a: boolean, b: boolean, c: boolean, d: boolean}}
+ */
 
 function isPointsInRectangle(pointsCurrRect, pointsNextRect){
     let points = {
@@ -257,6 +306,12 @@ function isPointsInRectangle(pointsCurrRect, pointsNextRect){
 }
 
 
+/**
+ * Function qui permet en fonction des points d'un rectangle courant et suivant, de savoir si le rectangle suivant est dans le courant
+ * @param pointNextRect
+ * @param pointsCurrRect
+ * @returns {boolean}
+ */
 function isPointNextRectInCurrRectangle(pointNextRect, pointsCurrRect){
 
     if(pointNextRect.x >= pointsCurrRect.a.x && pointNextRect.x <= pointsCurrRect.b.x){
@@ -271,6 +326,12 @@ function isPointNextRectInCurrRectangle(pointNextRect, pointsCurrRect){
         return false
     }
 }
+
+/**
+ * Fonction permettant de calculer tout les points d'un rectangle
+ * @param rect
+ * @returns {{a: {x: (string|Number), y: (string|Number)}, b: {x: *, y: (string|Number)}, c: {x: *, y: *}, d: {x: (string|Number), y: *}}}
+ */
 
 function getPointOfRectangle(rect){
     let pointsRect = {
@@ -295,6 +356,23 @@ function getPointOfRectangle(rect){
     return pointsRect
 }
 
+
+/**
+ * WORK IN PROGRESS
+ * Fonction permettant de supprimer le groupe de rectangle actuel et le remplacer par le suivant
+ * @param currentRectGrp Groupe de rectangle courant
+ * @param newRectGrp    Gro
+ */
+
+function changeElemInDom(currentRectGrp, newRectGrp){
+    let curGrp = currentRectGrp
+    let newGrp = newRectGrp
+
+    curGrp.parentNode.remove()
+
+    let svg = document.querySelector('svg')
+    svg.appendChild(newGrp)
+}
 
 window.addEventListener('load', init)
 
