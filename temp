@@ -46,7 +46,6 @@ function paintMainBox(widthMainBox, heightMainBox){
  * @returns {Element}
  */
 function paintSubBoxs(nb_Box, widthMainBox, heightMainBox){
-
     const heightSubBox = 70
 
     let wMainBox = widthMainBox
@@ -91,6 +90,7 @@ function getRandom(min, max) {
 
 
 
+
 /**
  * Fonction qui permet de trouver le meilleur placement possible
  * @param nbRep
@@ -115,40 +115,34 @@ function betterPlacementBox(nbRep, nb_box){
             element : []
         }
 
-        let theCost=calculateCostForDisposition(tab_rec);
-        console.log(i,theCost)
+        let theCost = calculateCostForDisposition(tab_rec);
 
-        if(theCost != 0){
-            group.surface = theCost;
-            group.element[0] = (tab_rec)
-            allGroup.push(group)
+        console.log(i, theCost)
 
-            if(!isStarted){
-                bestPlacement = tab_rec
-                tab_dispositions.push(theCost, bestPlacement)
-                isStarted = !isStarted
-            }
+        group.surface = theCost;
+        group.element[0] = (tab_rec)
+        allGroup.push(group)
 
-            if(theCost < tab_dispositions[0]){
-                bestPlacement = tab_rec
+        if(!isStarted){
+            bestPlacement = tab_rec
+            tab_dispositions.push(theCost, bestPlacement)
+            isStarted = !isStarted
+        }
 
-                tab_dispositions[0] = theCost
-                tab_dispositions[1] = bestPlacement
-            }
-            else{
-                continue
+
+
+        if(theCost < tab_dispositions[0]){
+            bestPlacement = tab_rec
+
+            tab_dispositions[0] = theCost
+            tab_dispositions[1] = bestPlacement
+            if (theCost==0)
+            {
+                break;
             }
         }
         else{
-            group.surface = theCost;
-            group.element[0] = (tab_rec)
-            allGroup.push(group)
-
-            bestPlacement = tab_rec
-            tab_dispositions[0] = theCost
-            tab_dispositions[1] = bestPlacement
-
-            break
+            continue
         }
     }
 
@@ -158,6 +152,7 @@ function betterPlacementBox(nbRep, nb_box){
     console.info('Nombre d\'iteration', nbRep)
     //console.info("Historique", allGroup)
 }
+
 
 /**
  * Fonction qui permet de savoir si une pair a déjà été check
@@ -186,16 +181,12 @@ function isPairInTable(rectCurr, rectNext, tab_pair){
     return isPair
 }
 
-
-
 /**
  * Fonction qui permet de calculer pour une "disposition" qui est un ensemble de rectangle, le cout total
  * @param tab_rect
  * @returns {number}
  */
-
 let tab_pair = []
-
 function calculateCostForDisposition(tab_rect){
     let totalCost = 0
 
@@ -204,24 +195,20 @@ function calculateCostForDisposition(tab_rect){
         for(let j = 0; j < tab_rect.length; j++){
             nextRect = tab_rect[j]
             if(currRect != nextRect){
-
-                let pair = [currRect, nextRect]
-                console.log(pair)
-                console.log(currRect, nextRect)
-                console.log(isPairInTable(currRect, nextRect, tab_pair))
-
-                //totalCost += caseManagementPoint(currRect, nextRect)
-
-
-                if(!isPairInTable(currRect, nextRect, tab_pair)){
-                    tab_pair.push(pair)
+                let pair = []
+                totalCost += caseManagementPoint(currRect, nextRect)
+                /*
+                if(isPairInTable(currRect, nextRect, tab_pair)){
                     totalCost += caseManagementPoint(currRect, nextRect)
-                }
+                }*/
+                pair[0] = currRect
+                pair[1] = nextRect
+                tab_pair.push(pair)
+
 
             }
         }
     }
-
     return totalCost
 }
 
